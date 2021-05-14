@@ -9,41 +9,38 @@ import java.util.Map;
 
 public class AnalyticsCounter {
 
-	public static void main(String args[]) throws Exception {
-		// first get input
-		BufferedReader reader = new BufferedReader(new FileReader("Project02Eclipse/symptoms.txt"));
+	/**
+	 * reads symptoms from a file and count occurrences then writes the count
+	 * results to a new file.
+	 *
+	 * @param inputFilePath  a path to the file containing the collected symptoms
+	 * @param resultFilePath a full path and a filename to store the results that
+	 *                       will be generated
+	 */
+	private static void analyseSymptoms(String inputFilePath, String resultFilePath) {
 
-		String line = reader.readLine();
+		final ISymptomReader reader = new ReadSymptomDataFromFile(inputFilePath);
 
-		Map<String, Long> symptoms = new HashMap<String, Long>();
+		final List<String> symptoms = reader.getSymptoms();
 
-		while (line != null) {
+		final ISymptomCounter counter = new CountSymptoms(symptoms);
 
-			if (symptoms.containsKey(line)) {
+		final Map<String, Integer> symptomsCount = counter.countArrayDuplicates();
 
-				symptoms.put(line, symptoms.get(line) + 1); // if symptom is already in dictionary, increment its count
-															// by 1
-			} else {
+		final IResultWriter writer = new WriteSymtomsCountToFile(resultFilePath);
 
-				symptoms.put(line, (long) 1); // else add symptom to dictionary and mark its count as 1
+		writer.writeResultsToFile(symptomsCount);
+	}
 
-			}
+	/**
+	 * @param args if any
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
 
-			line = reader.readLine(); // get next line
-		}
-
-		reader.close();
-
-		// next generate output
-		FileWriter writer = new FileWriter("result.out");
-
-		for (Object symptom : symptoms.entrySet()) {
-
-			writer.write(symptom.toString() + "\n");
-
-		}
-
-		writer.close();
+		analyseSymptoms((args[0] != null) ? args[0] : "Project02Eclipse/symptoms.txt",
+				(args[1] != null) ? args[1] : "result.out");
 
 	}
+
 }

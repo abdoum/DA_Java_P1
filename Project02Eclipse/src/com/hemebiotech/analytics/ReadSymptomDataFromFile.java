@@ -12,35 +12,57 @@ import java.util.List;
  */
 public class ReadSymptomDataFromFile implements ISymptomReader {
 
-	private String filepath;
-	
+	private String filePath;
+
 	/**
 	 * 
-	 * @param filepath a full or partial path to file with symptom strings in it, one per line
+	 * @param filePath a full or partial path to file with symptom strings in it,
+	 *                 one per line
 	 */
-	public ReadSymptomDataFromFile (String filepath) {
-		this.filepath = filepath;
+	public ReadSymptomDataFromFile(String filePath) {
+		this.filePath = filePath;
 	}
-	
+
+	/**
+	 * @throws IOException if path is invalid or writer Object not closed
+	 */
+
 	@Override
-	public List<String> GetSymptoms() {
+	public List<String> getSymptoms() {
+
 		ArrayList<String> result = new ArrayList<String>();
-		
-		if (filepath != null) {
+
+		FileReader fileConnection = null;
+		BufferedReader reader = null;
+
+		if (filePath != null) {
 			try {
-				BufferedReader reader = new BufferedReader (new FileReader(filepath));
+				fileConnection = new FileReader(filePath);
+				reader = new BufferedReader(fileConnection);
 				String line = reader.readLine();
-				
+
 				while (line != null) {
-					result.add(line);
+					result.add(line.toLowerCase().trim());
 					line = reader.readLine();
 				}
 				reader.close();
+
 			} catch (IOException e) {
 				e.printStackTrace();
+
+			} finally {
+				if (reader != null) {
+
+					try {
+						reader.close();
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
-		
+
 		return result;
 	}
 
